@@ -72,6 +72,7 @@ public abstract class BaseKawaMojo extends AbstractMojo
             } else {
                 Path schemeRootPath = new File(schemeRoot).toPath();
                 schemeCompileTargets = Files.find(Paths.get(schemeRoot), 999, 
+                    // for some reason maven crashes when using lambdas...
                     new BiPredicate<>(){
                         @Override
                         public boolean test(Path path, BasicFileAttributes attr) {
