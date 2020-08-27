@@ -11,9 +11,14 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.Arrays;
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
-import java.nio.Path;
-import java.nio.Paths;
+import java.util.function.Function;
+import java.util.function.BiPredicate;
+
 
  
 public abstract class BaseKawaMojo extends AbstractMojo
@@ -65,15 +70,23 @@ public abstract class BaseKawaMojo extends AbstractMojo
             if (schemeMainExists) {
                 schemeCompileTargets = Arrays.asList(schemeMain);
             } else {
-                Path schemeRootPath = new File(schemeRoot).getPath();
+                Path schemeRootPath = new File(schemeRoot).toPath();
                 schemeCompileTargets = Files.find(Paths.get(schemeRoot), 999, 
-                        (path, attr) -> {
+                    new BiPredicate<>(){
+                        @Override
+                        public boolean test(Path path, BasicFileAttributes attr) {
                             File f = path.toFile();
                             return !f.isDirectory() && f.getName().endsWith(".scm");
-                        })
-                    .map(path -> path.relativize(schemeRootPath))
-                    .map(path -> path.toString())
+                        }
+                    })
+                    .map(new Function<Path, String>(){
+                        @Override
+                        public String apply(Path path) {
+                            return path.relativize(schemeRootPath).toString();
+                        }
+                    })
                     .collect(Collectors.toList());
+                schemeCompileTargets = Arrays.asList();
             }
             projectDir = new File("./");
             String kawaImportPathsString = kawaImportPaths().stream().collect(Collectors.joining(":"));
