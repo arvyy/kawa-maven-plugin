@@ -11,18 +11,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.io.File;
 
- 
+/**
+ * Mojo for invoking unit test
+ */
 @Mojo(name = "test", requiresDependencyResolution = ResolutionScope.TEST)
 public class TestSchemeMojo extends BaseKawaMojo {
 
     @Override
     protected List<String> getPBCommands() {
-        return Arrays.asList(schemeTestMain);
-    }
-
-    @Override
-    protected File executeDir() {
-        return new File(schemeTestRoot);
+        return Arrays.asList(new File(schemeTestRoot, schemeTestMain).getAbsolutePath());
     }
 
     @Override

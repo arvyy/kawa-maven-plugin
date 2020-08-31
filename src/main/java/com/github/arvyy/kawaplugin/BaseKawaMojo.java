@@ -21,6 +21,9 @@ import java.util.function.BiPredicate;
 
 
  
+/**
+ * Base abstract kawa mojo
+ */
 public abstract class BaseKawaMojo extends AbstractMojo
 {
 
@@ -48,18 +51,25 @@ public abstract class BaseKawaMojo extends AbstractMojo
 
     protected File projectDir;
 
+    /**
+     * @return list of commands to be appended to the process builder for making kawa execution
+     */
     protected abstract List<String> getPBCommands();
 
-    protected File executeDir() {
-        return new File(schemeRoot);
-    }
-
+    /**
+     * @return list of paths passed to -Dkawa.import.path
+     */
     protected List<String> kawaImportPaths() {
         String kawaImportBase = new File(projectDir, schemeRoot).getAbsolutePath();
         String kawaImportLib = new File(projectDir, schemeLibRoot).getAbsolutePath();
         return Arrays.asList(kawaImportBase, kawaImportLib);
     }
 
+    /**
+     * action after kawa process ended
+     *
+     * @param statusCode kawa process exit code
+     */
     protected void onProcessEnd(int statusCode) throws MojoExecutionException {
     }
 
@@ -68,7 +78,7 @@ public abstract class BaseKawaMojo extends AbstractMojo
         try {
             schemeMainExists = new File(schemeRoot, schemeMain).exists();
             if (schemeMainExists) {
-                schemeCompileTargets = Arrays.asList(schemeMain);
+                schemeCompileTargets = Arrays.asList(new File(schemeRoot, schemeMain).getAbsolutePath());
             } else {
                 Path schemeRootPath = new File(schemeRoot).toPath();
                 schemeCompileTargets = Files.find(Paths.get(schemeRoot), 999, 
@@ -83,7 +93,7 @@ public abstract class BaseKawaMojo extends AbstractMojo
                     .map(new Function<Path, String>(){
                         @Override
                         public String apply(Path path) {
-                            return path.relativize(schemeRootPath).toString();
+                            return path.toString();
                         }
                     })
                     .collect(Collectors.toList());
@@ -98,7 +108,6 @@ public abstract class BaseKawaMojo extends AbstractMojo
             var envVars = pb.environment();
             envVars.put("CLASSPATH", makeCPString(project.getCompileClasspathElements()));
             pb.inheritIO();
-            pb.directory(executeDir());
             int code = pb.start().waitFor();
             onProcessEnd(code);
         } catch (Exception e) {

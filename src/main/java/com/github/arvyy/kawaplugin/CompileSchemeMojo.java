@@ -12,13 +12,17 @@ import java.util.stream.Stream;
 import java.util.Arrays;
 import java.io.File;
 
- 
+/**
+ * Mojo for compiling scheme files to .class
+ */
 @Mojo(name = "compile", requiresDependencyResolution = ResolutionScope.COMPILE, defaultPhase = LifecyclePhase.COMPILE)
 public class CompileSchemeMojo extends BaseKawaMojo {
     @Override
     protected List<String> getPBCommands() {
         String target = new File(projectDir, "target/classes").getAbsolutePath();
-        String compileTargetsString = schemeCompileTargets.stream().collect(Collectors.joining(" "));
+        String compileTargetsString = schemeCompileTargets
+            .stream()
+            .collect(Collectors.joining(" "));
         return Arrays.asList("-d", target, "-C", compileTargetsString);
     }
 }

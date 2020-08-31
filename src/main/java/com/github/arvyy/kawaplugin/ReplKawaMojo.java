@@ -10,12 +10,12 @@ import java.util.Arrays;
 import java.io.File;
 
 /**
- * Mojo for running main
+ * Mojo for invoking REPL with project's dependencies
  */
-@Mojo(name = "run", requiresDependencyResolution = ResolutionScope.RUNTIME)
-public class RunSchemeMojo extends BaseKawaMojo {
+@Mojo(name = "repl", requiresDependencyResolution = ResolutionScope.RUNTIME)
+public class ReplKawaMojo extends BaseKawaMojo {
     @Override
     protected List<String> getPBCommands() {
-        return Arrays.asList(new File(schemeRoot, schemeMain).getAbsolutePath());
+        return Arrays.asList();
     }
 }
