@@ -56,6 +56,10 @@ public abstract class BaseKawaMojo extends AbstractMojo
      */
     protected abstract List<String> getPBCommands();
 
+    protected List<String> getClassPathElements(MavenProject project) throws Exception {
+        return project.getCompileClasspathElements();
+    }
+
     /**
      * @return list of paths passed to -Dkawa.import.path
      */
@@ -106,7 +110,7 @@ public abstract class BaseKawaMojo extends AbstractMojo
             commands.addAll(getPBCommands());
             var pb = new ProcessBuilder(commands);
             var envVars = pb.environment();
-            envVars.put("CLASSPATH", makeCPString(project.getCompileClasspathElements()));
+            envVars.put("CLASSPATH", makeCPString(getClassPathElements(project)));
             pb.inheritIO();
             int code = pb.start().waitFor();
             onProcessEnd(code);

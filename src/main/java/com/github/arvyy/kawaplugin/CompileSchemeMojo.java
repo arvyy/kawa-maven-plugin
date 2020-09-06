@@ -15,7 +15,11 @@ import java.io.File;
 /**
  * Mojo for compiling scheme files to .class
  */
-@Mojo(name = "compile", requiresDependencyResolution = ResolutionScope.COMPILE, defaultPhase = LifecyclePhase.COMPILE)
+@Mojo(
+    name = "compile", 
+    requiresDependencyResolution = ResolutionScope.COMPILE, 
+    defaultPhase = LifecyclePhase.COMPILE
+)
 public class CompileSchemeMojo extends BaseKawaMojo {
     @Override
     protected List<String> getPBCommands() {

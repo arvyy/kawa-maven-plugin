@@ -14,12 +14,21 @@ import java.io.File;
 /**
  * Mojo for invoking unit test
  */
-@Mojo(name = "test", requiresDependencyResolution = ResolutionScope.TEST)
+@Mojo(
+    name = "test", 
+    defaultPhase = LifecyclePhase.TEST,
+    requiresDependencyResolution = ResolutionScope.TEST
+)
 public class TestSchemeMojo extends BaseKawaMojo {
 
     @Override
     protected List<String> getPBCommands() {
         return Arrays.asList(new File(schemeTestRoot, schemeTestMain).getAbsolutePath());
+    }
+
+    @Override
+    protected List<String> getClassPathElements(MavenProject project) throws Exception {
+        return project.getTestClasspathElements();
     }
 
     @Override
