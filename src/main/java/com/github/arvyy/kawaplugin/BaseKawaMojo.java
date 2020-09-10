@@ -155,7 +155,7 @@ public abstract class BaseKawaMojo extends AbstractMojo
                 String.format("--warn-undefined-variable=%s", warnUndefinedVariable),
                 String.format("--warn-unknown-member", warnUnknownMember),
                 String.format("--warn-invoke-unknown-method=%s", warnInvokeUnknownMethod),
-                String.format("--warn-unusued", warnUnused),
+                String.format("--warn-unused", warnUnused),
                 String.format("--warn-uninitialized=%s", warnUninitialized),
                 String.format("--warn-unreachable=%s", warnUnreachable),
                 String.format("--warn-void-used=%s", warnVoidUsed),
