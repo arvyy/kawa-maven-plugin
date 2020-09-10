@@ -42,6 +42,31 @@ public abstract class BaseKawaMojo extends AbstractMojo
     @Parameter(property = "schemeMain", defaultValue = "main.scm")
     protected String schemeMain;
 
+    // warning options
+    @Parameter(property = "warnUndefinedVariable", defaultValue = "true")
+    protected Boolean warnUndefinedVariable;
+
+    @Parameter(property = "warnUnknownMember", defaultValue = "true")
+    protected Boolean warnUnknownMember;
+
+    @Parameter(property = "warnInvokeUnknownMethod", defaultValue = "true")
+    protected Boolean warnInvokeUnknownMethod;
+
+    @Parameter(property = "warnUnused", defaultValue = "true")
+    protected Boolean warnUnused;
+
+    @Parameter(property = "warnUninitialized", defaultValue = "true")
+    protected Boolean warnUninitialized;
+
+    @Parameter(property = "warnUnreachable", defaultValue = "true")
+    protected Boolean warnUnreachable;
+
+    @Parameter(property = "warnVoidUsed", defaultValue = "true")
+    protected Boolean warnVoidUsed;
+
+    @Parameter(property = "warnAsError", defaultValue = "true")
+    protected Boolean warnAsError;
+
     protected boolean schemeMainExists;
 
     protected List<String> schemeCompileTargets;
@@ -106,6 +131,7 @@ public abstract class BaseKawaMojo extends AbstractMojo
             String kawaImportPathsString = kawaImportPaths().stream().collect(Collectors.joining(":"));
             String kawaImport = String.format("-Dkawa.import.path=%s", kawaImportPathsString);
             List<String> commands = new ArrayList<>(Arrays.asList("java", kawaImport, "kawa.repl"));
+            commands.addAll(makeWarnOptions());
             commands.addAll(getPBCommands());
             var pb = new ProcessBuilder(commands);
             var envVars = pb.environment();
@@ -122,5 +148,17 @@ public abstract class BaseKawaMojo extends AbstractMojo
         var sep = System.getProperty("path.separator");
         return locations.stream()
             .collect(Collectors.joining(sep));
+    }
+
+    private List<String> makeWarnOptions() {
+        return Arrays.asList(
+                String.format("--warn-undefined-variable=%s", warnUndefinedVariable),
+                String.format("--warn-unknown-member", warnUnknownMember),
+                String.format("--warn-invoke-unknown-method=%s", warnInvokeUnknownMethod),
+                String.format("--warn-unusued", warnUnused),
+                String.format("--warn-uninitialized=%s", warnUninitialized),
+                String.format("--warn-unreachable=%s", warnUnreachable),
+                String.format("--warn-void-used=%s", warnVoidUsed),
+                String.format("--warn-as-error=%s", warnAsError));
     }
 }
