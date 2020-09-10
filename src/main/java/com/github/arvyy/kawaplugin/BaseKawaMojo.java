@@ -101,7 +101,6 @@ public abstract class BaseKawaMojo extends AbstractMojo
                         }
                     })
                     .collect(Collectors.toList());
-                schemeCompileTargets = Arrays.asList();
             }
             projectDir = new File("./");
             String kawaImportPathsString = kawaImportPaths().stream().collect(Collectors.joining(":"));
