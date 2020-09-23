@@ -24,9 +24,9 @@ public class CompileSchemeMojo extends BaseKawaMojo {
     @Override
     protected List<String> getPBCommands() {
         String target = new File(projectDir, "target/classes").getAbsolutePath();
-        String compileTargetsString = schemeCompileTargets
-            .stream()
-            .collect(Collectors.joining(" "));
-        return Arrays.asList("-d", target, "-C", compileTargetsString);
+        ArrayList<String> lst = new ArrayList<>();
+        lst.addAll(Arrays.asList("-d", target, "-C"));
+        lst.addAll(schemeCompileTargets);
+        return lst;
     }
 }

@@ -45,4 +45,11 @@ public class TestSchemeMojo extends BaseKawaMojo {
         return lst;
     }
 
+    @Override
+    public void execute() throws MojoExecutionException {
+        if (!new File(schemeTestRoot, schemeTestMain).exists())
+            return;
+        super.execute();
+    }
+
 }

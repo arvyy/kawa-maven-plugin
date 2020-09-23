@@ -42,6 +42,9 @@ public abstract class BaseKawaMojo extends AbstractMojo
     @Parameter(property = "schemeMain", defaultValue = "main.scm")
     protected String schemeMain;
 
+    @Parameter(property = "schemeCompileTargets", required = false)
+    protected List<String> schemeCompileTargetsParameter;
+
     // warning options
     @Parameter(property = "warnUndefinedVariable", defaultValue = "true")
     protected Boolean warnUndefinedVariable;
@@ -108,6 +111,11 @@ public abstract class BaseKawaMojo extends AbstractMojo
             schemeMainExists = new File(schemeRoot, schemeMain).exists();
             if (schemeMainExists) {
                 schemeCompileTargets = Arrays.asList(new File(schemeRoot, schemeMain).getAbsolutePath());
+            } else if (schemeCompileTargetsParameter != null && !schemeCompileTargetsParameter.isEmpty()) {
+                schemeCompileTargets = new ArrayList<>();
+                for (String t: schemeCompileTargetsParameter) {
+                    schemeCompileTargets.add(new File(schemeRoot, t).getAbsolutePath());
+                }
             } else {
                 Path schemeRootPath = new File(schemeRoot).toPath();
                 schemeCompileTargets = Files.find(Paths.get(schemeRoot), 999, 
