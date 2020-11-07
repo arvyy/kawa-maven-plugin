@@ -42,8 +42,11 @@ public abstract class BaseKawaMojo extends AbstractMojo
     @Parameter(property = "schemeMain", defaultValue = "main.scm")
     protected String schemeMain;
 
+    @Parameter(property = "schemeMainArgs")
+    protected List<String> schemeMainArgs;
+
     @Parameter(property = "schemeCompileTargets", required = false)
-    protected List<String> schemeCompileTargetsParameter;
+    protected List<String> schemeCompileTargets;
 
     // warning options
     @Parameter(property = "warnUndefinedVariable", defaultValue = "true")
@@ -72,8 +75,6 @@ public abstract class BaseKawaMojo extends AbstractMojo
 
     protected boolean schemeMainExists;
 
-    protected List<String> schemeCompileTargets;
-
     @Parameter(property = "schemeTestMain", defaultValue = "main-test.scm")
     protected String schemeTestMain;
 
@@ -83,6 +84,8 @@ public abstract class BaseKawaMojo extends AbstractMojo
      * @return list of commands to be appended to the process builder for making kawa execution
      */
     protected abstract List<String> getPBCommands();
+
+    protected boolean asMain = false;
 
     protected List<String> getClassPathElements(MavenProject project) throws Exception {
         return project.getCompileClasspathElements();
@@ -110,29 +113,21 @@ public abstract class BaseKawaMojo extends AbstractMojo
         try {
             schemeMainExists = new File(schemeRoot, schemeMain).exists();
             if (schemeMainExists) {
+                asMain = true;
                 schemeCompileTargets = Arrays.asList(new File(schemeRoot, schemeMain).getAbsolutePath());
-            } else if (schemeCompileTargetsParameter != null && !schemeCompileTargetsParameter.isEmpty()) {
-                schemeCompileTargets = new ArrayList<>();
-                for (String t: schemeCompileTargetsParameter) {
-                    schemeCompileTargets.add(new File(schemeRoot, t).getAbsolutePath());
-                }
+            } else if (schemeCompileTargets != null && !schemeCompileTargets.isEmpty()) {
+                schemeCompileTargets = schemeCompileTargets
+                    .stream()
+                    .map(t -> new File(schemeRoot, t).getAbsolutePath())
+                    .collect(Collectors.toList());
             } else {
                 Path schemeRootPath = new File(schemeRoot).toPath();
                 schemeCompileTargets = Files.find(Paths.get(schemeRoot), 999, 
-                    // for some reason maven crashes when using lambdas...
-                    new BiPredicate<>(){
-                        @Override
-                        public boolean test(Path path, BasicFileAttributes attr) {
+                        (path, attr) -> {
                             File f = path.toFile();
-                            return !f.isDirectory() && f.getName().endsWith(".scm");
-                        }
-                    })
-                    .map(new Function<Path, String>(){
-                        @Override
-                        public String apply(Path path) {
-                            return path.toString();
-                        }
-                    })
+                            return !f.isDirectory() && f.getName().endsWith(".sld");
+                        })
+                    .map(Path::toString)
                     .collect(Collectors.toList());
             }
             projectDir = new File("./");
@@ -161,9 +156,9 @@ public abstract class BaseKawaMojo extends AbstractMojo
     private List<String> makeWarnOptions() {
         return Arrays.asList(
                 String.format("--warn-undefined-variable=%s", warnUndefinedVariable),
-                String.format("--warn-unknown-member", warnUnknownMember),
+                String.format("--warn-unknown-member=%s", warnUnknownMember),
                 String.format("--warn-invoke-unknown-method=%s", warnInvokeUnknownMethod),
-                String.format("--warn-unused", warnUnused),
+                String.format("--warn-unused=%s", warnUnused),
                 String.format("--warn-uninitialized=%s", warnUninitialized),
                 String.format("--warn-unreachable=%s", warnUnreachable),
                 String.format("--warn-void-used=%s", warnVoidUsed),

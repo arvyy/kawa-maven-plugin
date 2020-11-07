@@ -6,6 +6,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.*;
 
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.io.File;
 
@@ -16,6 +17,14 @@ import java.io.File;
 public class RunSchemeMojo extends BaseKawaMojo {
     @Override
     protected List<String> getPBCommands() {
-        return Arrays.asList(new File(schemeRoot, schemeMain).getAbsolutePath());
+        String mainPath = new File(schemeRoot, schemeMain).getAbsolutePath();
+        if (schemeMainArgs == null || schemeMainArgs.isEmpty())
+            return Arrays.asList(mainPath);
+        ArrayList<String> pb = new ArrayList<>();
+        pb.add(mainPath);
+        pb.addAll(schemeMainArgs);
+        System.out.println("PB");
+        System.out.println(pb);
+        return pb;
     }
 }
