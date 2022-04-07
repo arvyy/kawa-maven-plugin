@@ -1,5 +1,6 @@
 package com.github.arvyy.kawaplugin;
 
+import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.*;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -16,40 +17,36 @@ import java.io.File;
  */
 @Mojo(
     name = "test", 
-    defaultPhase = LifecyclePhase.TEST,
     requiresDependencyResolution = ResolutionScope.TEST
 )
-public class TestSchemeMojo extends BaseKawaMojo {
+public class TestSchemeMojo extends AbstractMojo {
+
+    @Parameter(defaultValue = "${project}", readonly = true, required = true)
+    MavenProject project;
+
+    @Parameter(property = "test-command", required = false)
+    List<String> compileCommand;
+
+    @Parameter(property = "skipTests", defaultValue = "false")
+    Boolean skipTests;
 
     @Override
-    protected List<String> getPBCommands() {
-        return Arrays.asList(new File(schemeTestRoot, schemeTestMain).getAbsolutePath());
-    }
-
-    @Override
-    protected List<String> getClassPathElements(MavenProject project) throws Exception {
-        return project.getTestClasspathElements();
-    }
-
-    @Override
-    protected void onProcessEnd(int code) throws MojoExecutionException {
-        if (code != 0) {
-            throw new MojoExecutionException("Test failures");
-        }
-    }
-
-    @Override
-    protected List<String> kawaImportPaths() {
-        ArrayList<String> lst = new ArrayList<>(super.kawaImportPaths());
-        lst.add(new File(projectDir, schemeTestRoot).getAbsolutePath());
-        return lst;
-    }
-
-    @Override
-    public void execute() throws MojoExecutionException {
-        if (!new File(schemeTestRoot, schemeTestMain).exists())
+    public void execute() throws MojoExecutionException, MojoFailureException {
+        if (Boolean.TRUE.equals(skipTests)) {
             return;
-        super.execute();
+        }
+        var cmd = compileCommand;
+        if (cmd.isEmpty()) {
+            cmd = List.of(
+                    "java",
+                    "-Dkawa.import.path=@KAWAIMPORT@SEPARATOR@PROJECTROOT/src/main/scheme@SEPARATOR@PROJECTROOT/src/test/scheme",
+                    "kawa.repl",
+                    "@PROJECTROOT/src/test/scheme/main-test.scm");
+        }
+        var code = MavenKawaInvoker.invokeKawa(cmd, project, getLog());
+        if (code != 0) {
+            throw new MojoFailureException("Test failures");
+        }
     }
 
 }

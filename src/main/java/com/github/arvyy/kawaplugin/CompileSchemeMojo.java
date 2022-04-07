@@ -1,5 +1,6 @@
 package com.github.arvyy.kawaplugin;
 
+import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.*;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -20,7 +21,32 @@ import java.io.File;
     requiresDependencyResolution = ResolutionScope.COMPILE, 
     defaultPhase = LifecyclePhase.COMPILE
 )
-public class CompileSchemeMojo extends BaseKawaMojo {
+public class CompileSchemeMojo extends AbstractMojo {
+
+    @Parameter(defaultValue = "${project}", readonly = true, required = true)
+    MavenProject project;
+
+    @Parameter(property = "compile-command", required = false)
+    List<String> compileCommand;
+
+    @Override
+    public void execute() throws MojoExecutionException, MojoFailureException {
+        var cmd = compileCommand;
+        if (cmd.isEmpty()) {
+            cmd = List.of(
+                    "java",
+                    "-Dkawa.import.path=@KAWAIMPORT@SEPARATOR@PROJECTROOT/src/main/scheme",
+                    "kawa.repl",
+                    "-d",
+                    "@PROJECTROOT/target/classes",
+                    "--main",
+                    "-C",
+                    "@PROJECTROOT/src/main/scheme/main.scm");
+        }
+        MavenKawaInvoker.invokeKawa(cmd, project, getLog());
+    }
+
+    /*
     @Override
     protected List<String> getPBCommands() {
         String target = new File(projectDir, "target/classes").getAbsolutePath();
@@ -33,4 +59,5 @@ public class CompileSchemeMojo extends BaseKawaMojo {
         lst.addAll(schemeCompileTargets);
         return lst;
     }
+     */
 }
