@@ -7,6 +7,10 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.*;
 import org.apache.maven.plugin.MojoExecutionException;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -41,11 +45,20 @@ public class TestSchemeMojo extends AbstractMojo {
                     "java",
                     "-Dkawa.import.path=@KAWAIMPORT@SEPARATOR@PROJECTROOT/src/main/scheme@SEPARATOR@PROJECTROOT/src/test/scheme",
                     "kawa.repl",
-                    "@PROJECTROOT/src/test/scheme/main-test.scm");
+                    "@PROJECTROOT/target/testrunner.scm");
         }
-        var code = MavenKawaInvoker.invokeKawa(cmd, project, getLog());
-        if (code != 0) {
-            throw new MojoFailureException("Test failures");
+        try {
+            var testrunnerPath = Path.of(project.getBasedir().getAbsolutePath()).resolve("target").resolve("testrunner.scm");
+            Files.createDirectories(testrunnerPath.getParent());
+            Files.deleteIfExists(testrunnerPath);
+            Files.copy(TestSchemeMojo.class.getResource("/testrunner.scm").openStream(), testrunnerPath);
+            var code = MavenKawaInvoker.invokeKawa(cmd, project, getLog());
+            Files.deleteIfExists(testrunnerPath);
+            if (code != 0) {
+                throw new MojoFailureException("Test failures");
+            }
+        } catch (IOException e) {
+            throw new MojoExecutionException(e);
         }
     }
 

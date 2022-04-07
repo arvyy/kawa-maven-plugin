@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.util.List;
 
 public class PackageLibraryVerifierTest extends TestCase {
+
     public void testMyPlugin() throws Exception {
         File testLibDir = ResourceExtractor.simpleExtractResources(getClass(), "/testLib");
         File testAppDir = ResourceExtractor.simpleExtractResources(getClass(), "/testApp");
