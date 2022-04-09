@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.MessageDigest;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
@@ -57,22 +58,22 @@ public class MavenKawaInvoker {
         } catch (IOException e) {
             throw new MojoExecutionException("Failed to create folder for kawa libraries' sources in " + path, e);
         }
-        mavenProject.getArtifacts().stream()
-                .filter(a -> a.getType().equals("kawalib"))
-                .forEach(a -> {
-                    try (var is = new ZipInputStream(new BufferedInputStream(Files.newInputStream(a.getFile().toPath())))) {
-                        ZipEntry e;
-                        while ((e = is.getNextEntry()) != null) {
-                            if (e.isDirectory())
-                                continue;
-                            var outputPath = path.resolve(e.getName());
-                            Files.createDirectories(outputPath.getParent());
-                            Files.copy(is, path.resolve(e.getName()));
-                        }
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
+        for (var a: mavenProject.getArtifacts()) {
+            if (!a.getType().equals("kawalib"))
+                continue;
+            try (var is = new ZipInputStream(new BufferedInputStream(Files.newInputStream(a.getFile().toPath())))) {
+                ZipEntry e;
+                while ((e = is.getNextEntry()) != null) {
+                    if (e.isDirectory())
+                        continue;
+                    var outputPath = path.resolve(e.getName());
+                    Files.createDirectories(outputPath.getParent());
+                    Files.copy(is, path.resolve(e.getName()));
+                }
+            } catch (IOException e) {
+                throw new MojoExecutionException("Failed to extract kawalib content for artifact " + a, e);
+            }
+        }
     }
 
 }

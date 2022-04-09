@@ -21,7 +21,8 @@ import java.io.File;
  */
 @Mojo(
     name = "test", 
-    requiresDependencyResolution = ResolutionScope.TEST
+    requiresDependencyResolution = ResolutionScope.TEST,
+    defaultPhase = LifecyclePhase.TEST
 )
 public class TestSchemeMojo extends AbstractMojo {
 

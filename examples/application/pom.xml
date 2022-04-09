@@ -1,0 +1,85 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- Some url that could be said to belong to you; similar to xml namespaces -->
+    <groupId>com.github.arvyy.kawa-project-example</groupId>
+    <!-- your project identifier -->
+    <artifactId>application</artifactId>
+    <version>0.0.1</version>
+
+    <dependencies>
+        <!-- Include kawa runtime depedency -->
+        <dependency>
+            <groupId>com.github.arvyy</groupId>
+            <artifactId>kawa</artifactId>
+            <version>3.1.1</version>
+        </dependency>
+
+        <!-- import librar project from `../library` -->
+        <dependency>
+            <groupId>com.github.arvyy.kawa-project-example</groupId>
+            <artifactId>library</artifactId>
+            <version>0.0.1</version>
+            <type>kawalib</type>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.github.arvyy</groupId>
+                <artifactId>kawa-maven-plugin</artifactId>
+                <version>0.0.6-SNAPSHOT</version>
+                <extensions>true</extensions>
+                <executions>
+                    <!--
+                        The below attaches kawa:test goal to maven test phase
+                        This way, when calling `mvn install`, kawa tests will be automatically executed
+                        and will fail the build / installation if there are test errors
+                        Remove if you don't have tests (shame on you)
+                    -->
+                    <execution>
+                        <id>test</id>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                    </execution>
+                    <!-- similarly, attach kawa:compile goal to maven compile phase, to produce class artifacts when calling `mvn package` -->
+                    <execution>
+                        <id>compile</id>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!--
+             add a shade plugin like this, which packages all jar dependencies (including kawa) into final
+             jar artifact, making it standalone
+             If you omit this, you will have to manually assemble classpath / jars at runtime
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.2.4</version>
+                <configuration>
+                    <transformers>
+                        <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                            <mainClass>main</mainClass>
+                        </transformer>
+                    </transformers>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

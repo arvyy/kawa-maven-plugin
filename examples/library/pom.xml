@@ -1,0 +1,56 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- Some url that could be said to belong to you; similar to xml namespaces -->
+    <groupId>com.github.arvyy.kawa-project-example</groupId>
+    <!-- your project identifier -->
+    <artifactId>library</artifactId>
+    <version>0.0.1</version>
+    <!-- for library-type of projects, packaging should be kawalib -->
+    <packaging>kawalib</packaging>
+
+    <dependencies>
+        <!-- Include kawa runtime depedency -->
+        <dependency>
+            <groupId>com.github.arvyy</groupId>
+            <artifactId>kawa</artifactId>
+            <version>3.1.1</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <!-- Arbitrary java dependency to showcase interop. Remove / add your own things you need -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-math3</artifactId>
+            <version>3.6.1</version>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.github.arvyy</groupId>
+                <artifactId>kawa-maven-plugin</artifactId>
+                <version>0.0.6-SNAPSHOT</version>
+                <!-- a must have for kawalib packaging type -->
+                <extensions>true</extensions>
+                <executions>
+                    <!--
+                        The below attaches kawa:test goal to maven test phase
+                        This way, when calling `mvn install`, kawa tests will be automatically executed
+                        and will fail the build / installation if there are test errors
+                        Remove if you don't have tests (shame on you)
+                    -->
+                    <execution>
+                        <id>test</id>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

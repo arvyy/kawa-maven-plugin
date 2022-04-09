@@ -2,15 +2,12 @@
 
 ## About
 
-A simple maven plugin for working with kawa, intended to give similar workflow as when working with java.
-Currently intermixing java in same project is a non-goal for this plugin.
-
-For example use of this plugin, see https://github.com/arvyy/kawa-maven-plugin-example/
+A maven plugin for working with kawa, the scheme implementation on jvm. 
 
 ## Kawa runtime
 
-Note, that this plugin expects kawa runtime available on classpath, and it doesn't bring it in by itself.
-One way to go about it, is to include kawa redistribution dependency (as is done in example project) from central
+This plugin expects kawa runtime available on classpath, and it (intentionally) doesn't bring it in by itself.
+Kawa is redistributed on central through
 
 ```
 <dependency>
@@ -20,102 +17,77 @@ One way to go about it, is to include kawa redistribution dependency (as is done
 </dependency>
 ```
 
-Alternatively, you can install any kawa.jar locally (with your own thought up groupId and artifactId), which you'd then add as dependency. See https://maven.apache.org/guides/mini/guide-3rd-party-jars-local.html for details.
+Alternatively, install any kawa.jar locally (with your own thought up groupId and artifactId),
+and add that as a dependency instead. See https://maven.apache.org/guides/mini/guide-3rd-party-jars-local.html for details.
 
-## Available maven goals
+## Maven goals
 
-Plugin exposes following goals. Since plugin follows standard maven naming convention, you can invoke using `mvn kawa:<goal>`, for example `mvn kawa:compile`. The word parameter refers to maven parameter concept; see section "Parameters" on how to change them.
+Plugin exposes following goals. Since plugin follows standard maven naming convention, 
+you can invoke using them `mvn kawa:<goal>`, for example `mvn kawa:compile`. 
 
-* `compile` -- compiles kawa sources into classes. Kawa sources are looked at directory defined by parameter `schemeRoot`, which defaults to /src/main/scheme. First, it checks whether or not a main file is present (defined by parameter `schemeMain`, defaults to `main.scm`). If yes, only it is compiled, and the other files it depends on are pulled transitively. If main file is not present, next it checks for `schemeCompileTargets` parameter. If the parameter (a list of files, relative to schemeRoot directory) is defined, those are compiled. If it's not defined, all .sld files under schemeRoot are compiled. During compilation phase, compile-time maven dependencies are included (which can be both java projects, and kawa projects made with this very plugin). This goal should be attached to maven's compile phase (see "Recommended configuration").
+You'll notice process builder parameter mentioned below -- this is a plugin parameter, a list of strings, which forms full command line
+used to launch appropriate feature. When running, simple textual substitutions are performed:
 
-* `test` -- runs the root test file defined by parameter schemeTestMain (defaults to main-test.scm) in test root directory defined by parameter schemeTestRoot (defaults to /src/test/scheme). Kawa sources are looked at compile-time directory (see `compile` target), as well in schemeTestRoot. At this stage, maven compilation doesn't fail on test failures alone -- it's imperative the scheme test code exists with status that signals failure (ie `(exit #f)`). See example project for how to setup a testrunner that invokes `(exit #f)` at the end of test suite if there were failures. This goal should be attached to maven's test phase (see "Recommended configuration").
+`@KAWAIMPORT` - gets replaced by directory, containing extraced library code. Meant to be used with kawa's `-Dkawa.import.path`.
+`@SEPARATOR` - gets replaced by path separator character; `;` on windows, `:` on unix.
+`@PROJECTROOT` - absolute path of maven project. 
 
-* `repl` -- runs REPL. Includes maven dependencies on path, as well as kawa source paths defined in `compile` target. The goal doesn't invoke compilation; if running repl you're unable to import libraries from this project, run a compile goal first.
-
-* `run` -- runs main file defined by parameter `schemeMain` (defaults to `main.scm`). Includes maven dependencies on path, as well as kawa source paths defined in `compile` target. Note, to pass command line parameters, use `schemeMainArgs` parameter
-
-## Parameters
-
-See https://maven.apache.org/guides/mini/guide-configuring-plugins.html for details. In short, to override parameter, either add -D option on command line (for example, `mvn kawa:compile -DschemeMain=main2.scm`), or add it to configuration block under plugin, for example
-
-```
-<plugin>
-    <groupId>com.github.arvyy</groupId>
-    <artifactId>kawa-maven-plugin</artifactId>
-    <configuration>
-        <schemeMain>main2.scm</schemeMain>
-    </configuration>
-</plugin>
-```
-
-Complete list of available parameters is as follows:
-
-* `schemeRoot` -- root folder for scheme files. Defaults to `./src/main/scheme/`
-* `schemeTestRoot` -- root folder for scheme test files. Defaults to `./src/test/scheme/`
-* `schemeMain` -- main file, relative from schemeRoot, for running and compiling to fatjar. Defaults to `main.scm`
-* `schemeTestMain` -- main file, relative from schemeTestRoot, for running unit test. Defaults to `main-test.scm`
-* `schemeMainArgs` -- list of arguments to pass to main, when running with `run` goal
-* `schemeCompileTargets` -- list of files, relative to scheme root, to compile
-
-Following warning parameters are transparantly passed to kawa; for details see kawa manual. Default values of each of those are set to `true`
-
-* `warnUndefinedVariable`
-* `warnUnknownMember`
-* `warnInvokeUnknownMethod`
-* `warnUnused`
-* `warnUninitialized`
-* `warnUnreachable`
-* `warnVoidUsed`
-* `warnAsError`
-
-## Recommended configuration
-
-It's recommended to attach `kawa:test` goal to maven's `test` phase, and `kawa:compile` goal to maven's `compile` phase.
-This way, when invoking higher level maven phases (for example `mvn package`), all appropriate kawa plugin goals will be executed as well. As such, configuration should look like this:
+As an example, default compile behavior is equivalent to following explicit configuration
 
 ```
-<plugin>
-    <groupId>com.github.arvyy</groupId>
-    <artifactId>kawa-maven-plugin</artifactId>
-    <version>0.0.5</version>
-    <executions>
-        <execution>
-            <id>test</id>
-            <goals>
-                <goal>test</goal>
-            </goals>
-        </execution>
-        <execution>
-            <id>compile</id>
-            <goals>
-                <goal>compile</goal>
-            </goals>
-        </execution>
-    </executions>
-</plugin>
+<groupId>com.github.arvyy</groupId>
+<artifactId>kawa-maven-plugin</artifactId>
+<version>VERSION</version>
+<configuration>
+    <compile-command>
+        <str>java</str>
+        <str>-Dkawa.import.path=@KAWAIMPORT@SEPARATOR@PROJECTROOT/src/main/scheme</str>
+        <str>kawa.repl</str>
+        <str>-d</str>
+        <str>@PROJECTROOT/target/classes</str>
+        <str>--main</str>
+        <str>-C</str>
+        <str>@PROJECTROOT/src/main/scheme/main.scm</str>
+    </compile-command>
+</configuration>
 ```
 
-Additionally, *if* you're writting a runnable application (as opposed to library), you'll probably want to distribute it as just a single jar file. In such case, include a shading plugin, which will make sure to include kawa runtime (as well as any other dependencies you have in your pom.xml) and also mark `main` as the entry point.
+### `compile`
 
-```
-<plugin>
-    <groupId>org.apache.maven.plugins</groupId>
-    <artifactId>maven-shade-plugin</artifactId>
-    <version>3.2.4</version>
-    <configuration>
-        <transformers>
-            <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                <mainClass>main</mainClass>
-            </transformer>
-        </transformers>
-    </configuration>
-    <executions>
-        <execution>
-            <phase>package</phase>
-            <goals>
-                <goal>shade</goal>
-            </goals>
-        </execution>
-    </executions>
-</plugin>
-```
+Compiles the project, more specifically src/main/scheme/main.scm, with all other modules being transitively included as imported from main. 
+
+Process builder parameter: `compile-command`.
+
+### `test`
+
+Runs tests - it expects to find a module `(main-test)` at src/test/scheme/main-test.scm, which must export a no arg method `run-tests`. Such concession is unfortunately
+needed to properly signal exit code to maven on test failures, so it can cancel the build.
+
+Process builder parameter: `test-command`.
+Skip tests parameter: `skipTests`. Most often useful to be setup from command line.
+
+### `repl`
+
+Starts repl, including src/main/scheme as root path, as well as including all maven dependencies.
+
+Process builder parameter: `repl-command`.
+
+### `run`
+
+Runs src/main/scheme/main.scm, without compiling.
+
+Process builder parameter: `run-command`.
+
+## Library and custom packaging
+
+You might have noticed, above steps mostly concern main program. What about libraries? 
+The issue with libraries, is that they cannot be precompiled. If they are, they're only binary compatible
+with other compilation units of same parameterization. The solution to this is using custom packaging, and managing them in source form.
+If you create a project to be used as a kawa library, define `<packaging>` as `kawalib`, which won't compile, but instead zip
+source code. When compiling ultimately main application, this plugin finds all dependencies with `kawalib` packaging,
+extracts them, and includes in kawa import path. Note, that for this to work, the plugin declaration 
+must define `<extensions>true</extensions>`.
+
+## Examples
+
+See `./examples` subdirectory for some minimal sample projects, which you can use as scaffolding to start your own.

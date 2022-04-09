@@ -48,6 +48,7 @@ public class PackageLibraryVerifierTest extends TestCase {
         verifier.deleteArtifact("com.github.arvyy.test", "test-app", "0.0.1", "pom");
         verifier.deleteArtifact("com.github.arvyy.test", "test-app", "0.0.1", "jar");
 
+        verifier.setSystemProperty("skipTests", "true"); // application tests intentionally broken
         verifier.executeGoals(List.of("kawa:compile", "install"));
         verifier.verifyArtifactPresent("com.github.arvyy.test", "test-app", "0.0.1", "pom");
         verifier.verifyArtifactPresent("com.github.arvyy.test", "test-app", "0.0.1", "jar");
