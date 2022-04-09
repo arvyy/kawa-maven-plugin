@@ -39,7 +39,7 @@ As an example, default compile behavior is equivalent to following explicit conf
 <artifactId>kawa-maven-plugin</artifactId>
 <version>VERSION</version>
 <configuration>
-    <compile-command>
+    <compileCommand>
         <str>java</str>
         <str>-Dkawa.import.path=@KAWAIMPORT@SEPARATOR@PROJECTROOT/src/main/scheme</str>
         <str>kawa.repl</str>
@@ -48,7 +48,7 @@ As an example, default compile behavior is equivalent to following explicit conf
         <str>--main</str>
         <str>-C</str>
         <str>@PROJECTROOT/src/main/scheme/main.scm</str>
-    </compile-command>
+    </compileCommand>
 </configuration>
 ```
 
@@ -56,27 +56,27 @@ As an example, default compile behavior is equivalent to following explicit conf
 
 Compiles the project, more specifically src/main/scheme/main.scm, with all other modules being transitively included as imported from main. 
 
-Process builder parameter: `compile-command`.
+Process builder parameter: `compileCommand`.
 
 ### `test`
 
 Runs tests - it expects to find a module `(main-test)` at src/test/scheme/main-test.scm, which must export a no arg method `run-tests`. Such concession is unfortunately
 needed to properly signal exit code to maven on test failures, so it can cancel the build.
 
-Process builder parameter: `test-command`.
+Process builder parameter: `testCommand`.
 Skip tests parameter: `skipTests`. Most often useful to be setup from command line.
 
 ### `repl`
 
 Starts repl, including src/main/scheme as root path, as well as including all maven dependencies.
 
-Process builder parameter: `repl-command`.
+Process builder parameter: `replCommand`.
 
 ### `run`
 
 Runs src/main/scheme/main.scm, without compiling.
 
-Process builder parameter: `run-command`.
+Process builder parameter: `runCommand`.
 
 ## Library and custom packaging
 
