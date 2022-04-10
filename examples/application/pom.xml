@@ -30,20 +30,8 @@
             <plugin>
                 <groupId>com.github.arvyy</groupId>
                 <artifactId>kawa-maven-plugin</artifactId>
-                <version>0.0.6</version>
+                <version>0.0.7</version>
                 <extensions>true</extensions>
-                <configuration>
-                    <compileCommand>
-                        <str>java</str>
-                        <str>-Dkawa.import.path=@KAWAIMPORT@SEPARATOR@PROJECTROOT/src/main/scheme</str>
-                        <str>kawa.repl</str>
-                        <str>-d</str>
-                        <str>@PROJECTROOT/target/classes</str>
-                        <str>--main</str>
-                        <str>-C</str>
-                        <str>@PROJECTROOT/src/main/scheme/main.scm</str>
-                    </compileCommand>
-                </configuration>
                 <executions>
                     <!--
                         The below attaches kawa:test goal to maven test phase
