@@ -11,8 +11,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.MessageDigest;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -21,17 +23,33 @@ public class MavenKawaInvoker {
     private final static String kawaImportPath = "target/classes/kawaLibraries";
 
     public static int invokeKawa(List<String> commandTemplate, MavenProject mavenProject, Log log) throws MojoExecutionException {
+        return invokeKawa(commandTemplate, mavenProject, log, false);
+    }
+
+    public static int invokeKawa(List<String> commandTemplate, MavenProject mavenProject, Log log, boolean includeTestDependencies) throws MojoExecutionException {
         String classpath = null;
         try {
-            classpath = mavenProject.getCompileClasspathElements().stream()
+            var cpElements = mavenProject.getCompileClasspathElements().stream();
+            if (includeTestDependencies) {
+                cpElements = Stream.concat(cpElements, mavenProject.getTestClasspathElements().stream());
+            }
+            classpath = cpElements
                     .collect(Collectors.joining(File.pathSeparator));
         } catch (DependencyResolutionRequiredException e) {
             throw new MojoExecutionException("Failed to resolve classpath env variable value", e);
         }
         var path  = mavenProject.getBasedir().toPath().resolve(kawaImportPath);
-        if (!Files.exists(path)) {
-            extractKawaLibraries(mavenProject, path);
+        delete: try {
+            if (Files.notExists(path))
+                break delete;
+            Iterable<Path> pathsToDelete = Files.walk(path).sorted(Comparator.reverseOrder())::iterator;
+            for (var pathToDelete: pathsToDelete) {
+                Files.deleteIfExists(pathToDelete);
+            }
+        } catch (IOException e) {
+            throw new MojoExecutionException(e);
         }
+        extractKawaLibraries(mavenProject, path);
         var expandedCommandTemplate = commandTemplate.stream()
                 .map(part -> part.replace("@KAWAIMPORT",  path.toAbsolutePath().toString())
                                 .replace("@PROJECTROOT", mavenProject.getBasedir().getAbsolutePath())

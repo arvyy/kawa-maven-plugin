@@ -53,7 +53,7 @@ public class TestSchemeMojo extends AbstractMojo {
             Files.createDirectories(testrunnerPath.getParent());
             Files.deleteIfExists(testrunnerPath);
             Files.copy(TestSchemeMojo.class.getResource("/testrunner.scm").openStream(), testrunnerPath);
-            var code = MavenKawaInvoker.invokeKawa(cmd, project, getLog());
+            var code = MavenKawaInvoker.invokeKawa(cmd, project, getLog(), true);
             Files.deleteIfExists(testrunnerPath);
             if (code != 0) {
                 throw new MojoFailureException("Test failures");
