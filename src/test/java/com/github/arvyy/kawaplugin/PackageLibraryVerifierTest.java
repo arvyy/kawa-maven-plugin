@@ -42,7 +42,7 @@ public class PackageLibraryVerifierTest extends TestCase {
         verifier.resetStreams();
 
         /*
-            compile test-app project including depencency on test-lib
+            compile test-app project including dependency on test-lib
          */
         verifier = new Verifier(testAppDir.getAbsolutePath());
         verifier.deleteArtifact("com.github.arvyy.test", "test-app", "0.0.1", "pom");

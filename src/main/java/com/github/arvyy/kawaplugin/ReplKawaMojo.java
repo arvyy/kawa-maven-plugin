@@ -26,6 +26,9 @@ public class ReplKawaMojo extends AbstractMojo {
     @Parameter(property = "repl-command", required = false)
     List<String> replCommand;
 
+    @Parameter(property = "repl-server", required=false)
+    String replPort;
+
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         var cmd = replCommand;
@@ -34,6 +37,11 @@ public class ReplKawaMojo extends AbstractMojo {
                     "java",
                     "-Dkawa.import.path=@KAWAIMPORT@SEPARATOR@PROJECTROOT/src/main/scheme",
                     "kawa.repl");
+        }
+        var port = replPort;
+        if (!port.isEmpty()) {
+            cmd.add("--server");
+            cmd.add(port);
         }
         MavenKawaInvoker.invokeKawa(cmd, project, getLog());
     }
