@@ -6,6 +6,7 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -13,12 +14,6 @@ import java.util.List;
  */
 @Mojo(name = "repl", requiresDependencyResolution = ResolutionScope.RUNTIME)
 public class ReplKawaMojo extends AbstractMojo {
-    /*
-    @Override
-    protected List<String> getPBCommands() {
-        return Arrays.asList();
-    }
-     */
 
     @Parameter(defaultValue = "${project}", readonly = true, required = true)
     MavenProject project;
@@ -26,20 +21,20 @@ public class ReplKawaMojo extends AbstractMojo {
     @Parameter(property = "repl-command", required = false)
     List<String> replCommand;
 
-    @Parameter(property = "repl-server", required=false)
+    @Parameter(property = "repl-port", required = false)
     String replPort;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         var cmd = replCommand;
         if (cmd.isEmpty()) {
-            cmd = List.of(
+            cmd = new ArrayList(List.of(
                     "java",
                     "-Dkawa.import.path=@KAWAIMPORT@SEPARATOR@PROJECTROOT/src/main/scheme",
-                    "kawa.repl");
+                    "kawa.repl"));
         }
         var port = replPort;
-        if (!port.isEmpty()) {
+        if (port != null && !port.isEmpty()) {
             cmd.add("--server");
             cmd.add(port);
         }

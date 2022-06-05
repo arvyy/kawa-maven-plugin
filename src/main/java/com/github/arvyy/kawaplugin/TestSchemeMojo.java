@@ -30,7 +30,7 @@ public class TestSchemeMojo extends AbstractMojo {
     MavenProject project;
 
     @Parameter(property = "test-command", required = false)
-    List<String> compileCommand;
+    List<String> testCommand;
 
     @Parameter(property = "skipTests", defaultValue = "false")
     Boolean skipTests;
@@ -40,7 +40,7 @@ public class TestSchemeMojo extends AbstractMojo {
         if (Boolean.TRUE.equals(skipTests)) {
             return;
         }
-        var cmd = compileCommand;
+        var cmd = testCommand;
         if (cmd.isEmpty()) {
             cmd = List.of(
                     "java",

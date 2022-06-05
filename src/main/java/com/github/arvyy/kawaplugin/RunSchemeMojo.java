@@ -18,11 +18,11 @@ public class RunSchemeMojo extends AbstractMojo {
     MavenProject project;
 
     @Parameter(property = "run-command", required = false)
-    List<String> compileCommand;
+    List<String> runCommand;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        var cmd = compileCommand;
+        var cmd = runCommand;
         if (cmd.isEmpty()) {
             cmd = List.of(
                     "java",
@@ -32,19 +32,4 @@ public class RunSchemeMojo extends AbstractMojo {
         }
         MavenKawaInvoker.invokeKawa(cmd, project, getLog());
     }
-
-    /*
-    @Override
-    protected List<String> getPBCommands() {
-        String mainPath = new File(schemeRoot, schemeMain).getAbsolutePath();
-        if (schemeMainArgs == null || schemeMainArgs.isEmpty())
-            return Arrays.asList(mainPath);
-        ArrayList<String> pb = new ArrayList<>();
-        pb.add(mainPath);
-        pb.addAll(schemeMainArgs);
-        System.out.println("PB");
-        System.out.println(pb);
-        return pb;
-    }
-     */
 }
