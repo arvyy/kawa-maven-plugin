@@ -96,7 +96,7 @@ public class PackageLibraryVerifierTest extends TestCase {
     }
 
     /*
-        run test-app project, check if it scheme implementation creates file test.out with content test1\ntest2
+        run test-app project, check if it scheme implementation creates file test.out with content test1\ntest2\ncmdarg
      */
     void goalRunApp() throws Exception {
         var verifier = new Verifier(testAppDir.getAbsolutePath());
@@ -104,8 +104,9 @@ public class PackageLibraryVerifierTest extends TestCase {
         verifier.deleteArtifact("com.github.arvyy.test", "test-app", "0.0.1", "jar");
         Files.deleteIfExists(testAppDir.toPath().resolve("test.out"));
 
+        verifier.setSystemProperty("mainArgs", "cmdarg1, cmdarg2");
         verifier.executeGoals(List.of("kawa:run"));
-        assertEquals(Files.readAllLines(testAppDir.toPath().resolve("test.out")), List.of("ok1", "ok2"));
+        assertEquals(Files.readAllLines(testAppDir.toPath().resolve("test.out")), List.of("ok1", "ok2", "cmdarg1"));
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
     }

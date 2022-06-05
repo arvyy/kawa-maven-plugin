@@ -6,6 +6,7 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -20,15 +21,19 @@ public class RunSchemeMojo extends AbstractMojo {
     @Parameter(property = "runCommand", required = false)
     List<String> runCommand;
 
+    @Parameter(property = "mainArgs", required = false)
+    List<String> mainArgs;
+
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         var cmd = runCommand;
         if (cmd.isEmpty()) {
-            cmd = List.of(
+            cmd = new ArrayList(List.of(
                     "java",
                     "-Dkawa.import.path=@KAWAIMPORT@SEPARATOR@PROJECTROOT/src/main/scheme",
                     "kawa.repl",
-                    "@PROJECTROOT/src/main/scheme/main.scm");
+                    "@PROJECTROOT/src/main/scheme/main.scm"));
+            cmd.addAll(mainArgs);
         }
         MavenKawaInvoker.invokeKawa(cmd, project, getLog());
     }

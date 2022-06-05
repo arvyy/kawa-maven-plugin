@@ -66,6 +66,7 @@ Runs tests - it expects to find a module `(main-test)` at src/test/scheme/main-t
 needed to properly signal exit code to maven on test failures, so it can cancel the build.
 
 Process builder parameter: `testCommand`.
+
 Skip tests parameter: `skipTests`. Most often useful to be setup from command line.
 
 ### `repl`
@@ -73,6 +74,7 @@ Skip tests parameter: `skipTests`. Most often useful to be setup from command li
 Starts repl, including src/main/scheme as root path, as well as including all maven dependencies.
 
 Process builder parameter: `replCommand`.
+
 Repl server parameter: `replPort`. If present and not empty, will start kawa repl server, that can be connected to through telnet.
 
 ### `run`
@@ -80,6 +82,9 @@ Repl server parameter: `replPort`. If present and not empty, will start kawa rep
 Runs src/main/scheme/main.scm, without compiling.
 
 Process builder parameter: `runCommand`.
+
+Main commandline args parameter: `mainArgs`. If present, they get passed as arguments to kawa application invocation. If you're using `-D` flag 
+to pass multiple values, use `,` to delimit them.
 
 ## Library and custom packaging
 
