@@ -18,10 +18,10 @@ public class ReplKawaMojo extends AbstractMojo {
     @Parameter(defaultValue = "${project}", readonly = true, required = true)
     MavenProject project;
 
-    @Parameter(property = "repl-command", required = false)
+    @Parameter(property = "replCommand", required = false)
     List<String> replCommand;
 
-    @Parameter(property = "repl-port", required = false)
+    @Parameter(property = "replPort", required = false)
     String replPort;
 
     @Override

@@ -17,7 +17,7 @@ public class RunSchemeMojo extends AbstractMojo {
     @Parameter(defaultValue = "${project}", readonly = true, required = true)
     MavenProject project;
 
-    @Parameter(property = "run-command", required = false)
+    @Parameter(property = "runCommand", required = false)
     List<String> runCommand;
 
     @Override

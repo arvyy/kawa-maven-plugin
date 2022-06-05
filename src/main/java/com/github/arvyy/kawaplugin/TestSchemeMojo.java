@@ -29,7 +29,7 @@ public class TestSchemeMojo extends AbstractMojo {
     @Parameter(defaultValue = "${project}", readonly = true, required = true)
     MavenProject project;
 
-    @Parameter(property = "test-command", required = false)
+    @Parameter(property = "testCommand", required = false)
     List<String> testCommand;
 
     @Parameter(property = "skipTests", defaultValue = "false")

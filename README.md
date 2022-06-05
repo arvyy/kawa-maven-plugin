@@ -52,6 +52,8 @@ As an example, default compile behavior is equivalent to following explicit conf
 </configuration>
 ```
 
+For plugin configuration, please consult https://maven.apache.org/guides/mini/guide-configuring-plugins.html .
+
 ### `compile`
 
 Compiles the project, more specifically src/main/scheme/main.scm, with all other modules being transitively included as imported from main. 
@@ -71,6 +73,7 @@ Skip tests parameter: `skipTests`. Most often useful to be setup from command li
 Starts repl, including src/main/scheme as root path, as well as including all maven dependencies.
 
 Process builder parameter: `replCommand`.
+Repl server parameter: `replPort`. If present and not empty, will start kawa repl server, that can be connected to through telnet.
 
 ### `run`
 
