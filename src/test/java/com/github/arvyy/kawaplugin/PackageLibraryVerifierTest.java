@@ -40,7 +40,7 @@ public class PackageLibraryVerifierTest extends TestCase {
             try {
                 var v = new Verifier(testLibDir.getAbsolutePath());
                 v.setForkJvm(false);
-                v.setSystemProperty("repl-port", "1234");
+                v.setSystemProperty("replPort", "1234");
                 v.executeGoal("kawa:repl");
                 v.verifyErrorFreeLog();
                 v.resetStreams();

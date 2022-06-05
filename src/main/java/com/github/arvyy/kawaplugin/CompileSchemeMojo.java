@@ -26,7 +26,7 @@ public class CompileSchemeMojo extends AbstractMojo {
     @Parameter(defaultValue = "${project}", readonly = true, required = true)
     MavenProject project;
 
-    @Parameter(property = "compile-command", required = false)
+    @Parameter(property = "compileCommand", required = false)
     List<String> compileCommand;
 
     @Override
