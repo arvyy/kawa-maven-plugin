@@ -7,4 +7,5 @@
     (define (test)
       (if (= 1 ((MutableInt 1):getValue))
           "ok1"
-          "fail1"))))
+          "fail1"))
+    ))

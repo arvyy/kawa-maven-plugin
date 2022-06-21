@@ -20,7 +20,7 @@ import java.util.zip.ZipInputStream;
 
 public class MavenKawaInvoker {
 
-    private final static String kawaImportPath = "target/classes/kawaLibraries";
+    private final static String kawaImportPath = "target/kawaLibraries";
 
     public static int invokeKawa(List<String> commandTemplate, MavenProject mavenProject, Log log) throws MojoExecutionException {
         return invokeKawa(commandTemplate, mavenProject, log, false);
@@ -30,8 +30,10 @@ public class MavenKawaInvoker {
         String classpath = null;
         try {
             var cpElements = mavenProject.getCompileClasspathElements().stream();
+            cpElements = Stream.concat(cpElements, mavenProject.getResources().stream().map(r -> r.getDirectory()));
             if (includeTestDependencies) {
                 cpElements = Stream.concat(cpElements, mavenProject.getTestClasspathElements().stream());
+                cpElements = Stream.concat(cpElements, mavenProject.getTestResources().stream().map(r -> r.getDirectory()));
             }
             classpath = cpElements
                     .collect(Collectors.joining(File.pathSeparator));
