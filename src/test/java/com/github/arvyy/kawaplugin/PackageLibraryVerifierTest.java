@@ -39,14 +39,13 @@ public class PackageLibraryVerifierTest extends TestCase {
     }
 
     /*
-        Run repl on test-lib project, verify it launches a server over the port 1234
+        Run repl on test-lib project, verify it launches a server over the port 12345
      */
     void goalReplServerLib() throws Exception {
         var replThread = new Thread(() -> {
             try {
                 var v = newVerifier(testLibDir);
-                v.setForkJvm(false);
-                v.setSystemProperty("replPort", "1234");
+                v.setSystemProperty("replPort", "12345");
                 v.executeGoal("kawa:repl");
                 v.verifyErrorFreeLog();
                 v.resetStreams();
@@ -55,9 +54,12 @@ public class PackageLibraryVerifierTest extends TestCase {
             }
         });
         replThread.start();
-        replThread.interrupt();
+        try {
+            Thread.sleep(10000);
+        } catch(Exception ignored) {
+        }
         var client = new TelnetClient();
-        client.connect("localhost", 1234);
+        client.connect("localhost", 12345);
         var writer = new OutputStreamWriter(client.getOutputStream());
         writer.write("(+ 1 2)\r\n");
         writer.flush();
