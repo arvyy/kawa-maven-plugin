@@ -38,7 +38,7 @@
             <plugin>
                 <groupId>com.github.arvyy</groupId>
                 <artifactId>kawa-maven-plugin</artifactId>
-                <version>0.0.8-SNAPSHOT</version>
+                <version>${kawa-maven-plugin.version}</version>
                 <extensions>true</extensions>
             </plugin>
         </plugins>

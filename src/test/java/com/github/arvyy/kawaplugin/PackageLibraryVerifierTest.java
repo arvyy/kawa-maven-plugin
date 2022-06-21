@@ -20,11 +20,17 @@ public class PackageLibraryVerifierTest extends TestCase {
         testAppDir = ResourceExtractor.simpleExtractResources(getClass(), "/testApp");
     }
 
+    Verifier newVerifier(File dir) throws VerificationException {
+        var verifier = new Verifier(dir.getAbsolutePath());
+        verifier.setSystemProperty("kawa-maven-plugin.version", System.getProperty("kawa-maven-plugin.version"));
+        return verifier;
+    }
+
     /*
         Run test on test-lib project
      */
     void goalTestLib() throws Exception {
-        var verifier = new Verifier(testLibDir.getAbsolutePath());
+        var verifier = newVerifier(testLibDir);
         verifier.deleteArtifact("com.github.arvyy.test", "test-lib", "0.0.1", "pom");
         verifier.deleteArtifact("com.github.arvyy.test", "test-lib", "0.0.1", "zip");
         verifier.executeGoal("kawa:test");
@@ -38,7 +44,7 @@ public class PackageLibraryVerifierTest extends TestCase {
     void goalReplServerLib() throws Exception {
         var replThread = new Thread(() -> {
             try {
-                var v = new Verifier(testLibDir.getAbsolutePath());
+                var v = newVerifier(testLibDir);
                 v.setForkJvm(false);
                 v.setSystemProperty("replPort", "1234");
                 v.executeGoal("kawa:repl");
@@ -68,7 +74,7 @@ public class PackageLibraryVerifierTest extends TestCase {
         Install test-lib project
      */
     void goalInstallLib() throws Exception {
-        var verifier = new Verifier(testLibDir.getAbsolutePath());
+        var verifier = newVerifier(testLibDir);
         verifier.deleteArtifact("com.github.arvyy.test", "test-lib", "0.0.1", "pom");
         verifier.deleteArtifact("com.github.arvyy.test", "test-lib", "0.0.1", "zip");
 
@@ -83,7 +89,7 @@ public class PackageLibraryVerifierTest extends TestCase {
         compile test-app project including dependency on test-lib
      */
     void goalCompileApp() throws Exception {
-        var verifier = new Verifier(testAppDir.getAbsolutePath());
+        var verifier = newVerifier(testAppDir);
         verifier.deleteArtifact("com.github.arvyy.test", "test-app", "0.0.1", "pom");
         verifier.deleteArtifact("com.github.arvyy.test", "test-app", "0.0.1", "jar");
 
@@ -99,7 +105,7 @@ public class PackageLibraryVerifierTest extends TestCase {
         run test-app project, check if it scheme implementation creates file test.out with content test1\ntest2\ncmdarg
      */
     void goalRunApp() throws Exception {
-        var verifier = new Verifier(testAppDir.getAbsolutePath());
+        var verifier = newVerifier(testAppDir);
         verifier.deleteArtifact("com.github.arvyy.test", "test-app", "0.0.1", "pom");
         verifier.deleteArtifact("com.github.arvyy.test", "test-app", "0.0.1", "jar");
         Files.deleteIfExists(testAppDir.toPath().resolve("test.out"));
@@ -115,7 +121,7 @@ public class PackageLibraryVerifierTest extends TestCase {
         run tests in test-app project (which intentionally fails), check handling
      */
     void goalTestApp() throws Exception {
-        var verifier = new Verifier(testAppDir.getAbsolutePath());
+        var verifier = newVerifier(testAppDir);
         try {
             verifier.executeGoals(List.of("kawa:test"));
             verifier.verifyErrorFreeLog();
@@ -129,7 +135,7 @@ public class PackageLibraryVerifierTest extends TestCase {
         run test with -DskipTests=true, check it doesn't run & fail
      */
     void goalTestAppSkipTestsTrue() throws Exception {
-        var verifier = new Verifier(testAppDir.getAbsolutePath());
+        var verifier = newVerifier(testAppDir);
         verifier.setSystemProperty("skipTests", "true");
         verifier.executeGoals(List.of("kawa:test"));
         verifier.verifyErrorFreeLog();

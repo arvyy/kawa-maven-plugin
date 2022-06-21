@@ -1,0 +1,45 @@
+<!--
+    This is only some util methods for updating the version in source and running tests
+    Because it's painful to manually change the versions, since the integration test projects using the plugin
+    don't pick up that plugin version
+-->
+<project name="kawa-maven-plugin-util" default="set-version-and-test">
+
+    <property name="version" value="0.0.8"/>
+
+    <!--
+        Sets plugin version as ${version}
+        Installs it to local repo (else tests won't work)
+        And launches integration test
+    -->
+    <target name="set-version-and-test" depends="prepare_unix, prepare_windows">
+        <exec dir="." executable="${exec}">
+            <arg line="${args} 'mvn versions:set -DnewVersion=${version}'"/>
+        </exec>
+        <exec dir="." executable="${exec}">
+            <arg line="${args} 'mvn clean install -DskipTests=true'"/>
+        </exec>
+        <exec dir="." executable="${exec}">
+            <arg line="${args} 'mvn test -Dkawa-maven-plugin.version=${version}'"/>
+        </exec>
+    </target>
+
+    <condition property="isWindows">
+        <os family="windows" />
+    </condition>
+
+    <condition property="isUnix">
+        <os family="unix" />
+    </condition>
+
+    <target name="prepare_windows" if="isWindows">
+        <property name="exec" value="cmd"/>
+        <property name="args" value="/c"/>
+    </target>
+
+    <target name="prepare_unix" if="isUnix">
+        <property name="exec" value="sh"/>
+        <property name="args" value="-c"/>
+    </target>
+
+</project>
