@@ -54,8 +54,9 @@ public class MavenKawaInvoker {
         extractKawaLibraries(mavenProject, path);
         var expandedCommandTemplate = commandTemplate.stream()
                 .map(part -> part.replace("@KAWAIMPORT",  path.toAbsolutePath().toString())
-                                .replace("@PROJECTROOT", mavenProject.getBasedir().getAbsolutePath())
-                        .replace("@SEPARATOR", File.pathSeparator)
+                                 .replace("@PROJECTROOT", mavenProject.getBasedir().getAbsolutePath())
+                                 .replace("@SEPARATOR", File.pathSeparator)
+                                 .replace("@GROUPID", mavenProject.getGroupId())
                 )
                 .collect(Collectors.toList());
         log.debug("Using classpath " + classpath);
