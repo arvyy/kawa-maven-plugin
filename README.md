@@ -31,6 +31,7 @@ used to launch appropriate feature. When running, simple textual substitutions a
 `@KAWAIMPORT` - gets replaced by directory, containing extraced library code. Meant to be used with kawa's `-Dkawa.import.path`.
 `@SEPARATOR` - gets replaced by path separator character; `;` on windows, `:` on unix.
 `@PROJECTROOT` - absolute path of maven project. 
+`@GROUPID` - the groupId of the maven project.
 
 As an example, default compile behavior is equivalent to following explicit configuration
 
